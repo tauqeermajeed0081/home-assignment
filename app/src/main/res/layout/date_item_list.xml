@@ -19,11 +19,11 @@
             android:textSize="@dimen/_12ssp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="@dimen/_8sdp"
             android:id="@+id/nestedRv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/date" />
+            android:layout_below="@+id/date"
+            android:layout_marginTop="@dimen/_8sdp" />
 
     </RelativeLayout>
 

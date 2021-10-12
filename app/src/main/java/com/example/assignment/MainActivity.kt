@@ -6,7 +6,9 @@ import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignment.adapter.DateAdapter
@@ -16,7 +18,8 @@ import com.example.assignment.model.ItemData
 import com.example.assignment.model.ItemModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener,
+    AdapterView.OnItemSelectedListener {
     lateinit var binding: ActivityMainBinding
     private var dateAdapter: DateAdapter? = null
     private var dateModelArray: ArrayList<DateModel> = ArrayList()
@@ -34,7 +37,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setUpRV()
     }
 
-    private fun setUpRV(){
+    private fun setUpRV() {
         val layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.rvList.layoutManager = layoutManager
@@ -42,9 +45,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.rvList.adapter = dateAdapter
     }
 
-    private fun populateData(){
-        for (i in 0..5){
-            itemListModelArray.add(ItemModel("Grocery",100))
+    private fun populateData() {
+        for (i in 0..5) {
+            itemListModelArray.add(ItemModel("Grocery", 100))
         }
         dateModelArray.add(DateModel(getCurrentTimeStamp(), itemListModelArray))
         dateAdapter = DateAdapter(
@@ -55,36 +58,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        when(v){
-            binding.addButton ->{
-
+        when (v) {
+            binding.addButton -> {
+                alertDialog()
             }
         }
     }
 
     private fun alertDialog() {
-
         itemData.clear()
-        itemData.add(ItemData())
+        itemData.add(ItemData(1, "Expense"))
+        itemData.add(ItemData(2, "Income"))
         val adapter: ArrayAdapter<ItemData> = ArrayAdapter<ItemData>(
             this,
             android.R.layout.simple_spinner_dropdown_item,
             itemData
         )
 
-        dialog = BottomSheetDialog(this)
+        dialog = Dialog(this)
         dialog?.setContentView(R.layout.popup_dialog)
         dialog?.setCancelable(false)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val spinner = dialog?.findViewById<TextView>(R.id.mySpinner)
-//        spinner.setAdapter(adapter)
+        val spinner = dialog?.findViewById<Spinner>(R.id.mySpinner)
+        spinner?.adapter = adapter
 
-        spinner?.setOnClickListener {
-
-        }
-
+        spinner?.onItemSelectedListener = this
         dialog?.show()
 
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
     }
 }

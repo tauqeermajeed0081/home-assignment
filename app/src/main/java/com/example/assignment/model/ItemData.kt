@@ -1,8 +1,9 @@
 package com.example.assignment.model
 
-class ItemData {
-    var id: String? = null
+data class ItemData(
+    var id: Int? = -1,
     var name: String? = null
+) {
 
     override fun toString(): String {
         return name!!
