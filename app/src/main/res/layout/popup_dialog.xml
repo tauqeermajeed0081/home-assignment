@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shape_rectangle_grey"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@drawable/shape_rectangle_grey">
 
     <TextView
         android:id="@+id/mainText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_transaction"
-        android:textSize="@dimen/_14sdp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/_15sdp"
-        android:textColor="@color/black"/>
+        android:text="@string/add_transaction"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_14sdp" />
 
     <Spinner
         android:id="@+id/mySpinner"
-        android:layout_below="@id/mainText"
-        android:layout_marginTop="@dimen/_15sdp"
-        android:layout_marginStart="@dimen/_30sdp"
-        android:layout_marginEnd="@dimen/_30sdp"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_40sdp" />
+        android:layout_height="@dimen/_40sdp"
+        android:layout_below="@id/mainText"
+        android:layout_marginStart="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:layout_marginEnd="@dimen/_30sdp"
+        android:background="@drawable/shape_rectangle_grey" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/descriptionEditText"
-        android:layout_below="@id/mySpinner"
-        android:layout_marginStart="@dimen/_40sdp"
-        android:layout_marginEnd="@dimen/_40sdp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/mySpinner"
+        android:layout_marginStart="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_30sdp"
         app:boxBackgroundMode="outline"
         app:boxStrokeColor="@color/black"
         app:boxStrokeWidth="@dimen/_1sdp"
@@ -46,7 +48,7 @@
             android:focusable="true"
             android:hint="@string/description"
             android:imeActionLabel="Done"
-            android:imeOptions="actionNext"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
             android:textColor="@color/black"
@@ -54,14 +56,81 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/addButton"
+    <RelativeLayout
+        android:id="@+id/relInc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/descriptionEditText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@drawable/shape_rectangle_grey">
+
+        <RelativeLayout
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dollar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:text="@string/dollar"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <EditText
+                android:id="@+id/incDecValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_toStartOf="@+id/linear"
+                android:layout_toEndOf="@+id/dollar"
+                android:inputType="number"
+                android:text="@string/one"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <LinearLayout
+                android:id="@+id/linear"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/_6sdp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/up"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:padding="@dimen/_2sdp"
+                    android:src="@drawable/up"
+                    app:tint="@color/black" />
+
+                <ImageView
+                    android:id="@+id/down"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:padding="@dimen/_2sdp"
+                    android:src="@drawable/down"
+                    app:tint="@color/black" />
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+
+        android:id="@+id/addButton"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
-        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_below="@+id/relInc"
         android:layout_marginStart="@dimen/_80sdp"
+        android:layout_marginTop="@dimen/_30sdp"
         android:layout_marginEnd="@dimen/_80sdp"
+        android:layout_marginBottom="@dimen/_30sdp"
         android:background="@drawable/shape_rectangle_grey"
         android:text="@string/add"
         android:textAllCaps="false"
