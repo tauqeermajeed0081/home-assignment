@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/mainText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_transaction"
+        android:textSize="@dimen/_14sdp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:textColor="@color/black"/>
+
+    <Spinner
+        android:id="@+id/mySpinner"
+        android:layout_below="@id/mainText"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:layout_marginStart="@dimen/_30sdp"
+        android:layout_marginEnd="@dimen/_30sdp"
+        android:layout_width="match_parent"
+        android:spinnerMode="dialog"
+        android:layout_height="@dimen/_40sdp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/descriptionEditText"
+        android:layout_below="@id/mySpinner"
+        android:layout_marginStart="@dimen/_40sdp"
+        android:layout_marginEnd="@dimen/_40sdp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/black"
+        app:boxStrokeWidth="@dimen/_1sdp"
+        app:hintEnabled="false">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_45sdp"
+            android:backgroundTint="@color/transparent"
+            android:drawablePadding="@dimen/_10sdp"
+            android:focusable="true"
+            android:hint="@string/description"
+            android:imeActionLabel="Done"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/black"
+            android:textColorHint="@color/awesome_grey_light" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/addButton"
+        android:layout_below="@+id/descriptionEditText"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_80sdp"
+        android:layout_marginEnd="@dimen/_80sdp"
+        android:background="@drawable/shape_rectangle_grey"
+        android:text="@string/add"
+        android:textAllCaps="false"
+        android:textColor="@color/black" />
+
+</RelativeLayout>
