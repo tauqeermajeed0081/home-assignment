@@ -37,7 +37,7 @@ class DateAdapter(
             itemListAdapter =
                 ItemAdapter(
                     context,
-                    itemAtPos.itemList, itemClickListener
+                    itemAtPos.itemList, itemClickListener, itemAtPos, position
                 )
             itemListRv.adapter = itemListAdapter
         }

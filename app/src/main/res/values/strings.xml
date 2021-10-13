@@ -24,4 +24,5 @@
     </string-array>
     <string name="dollar_amount">$ %1$d</string>
     <string name="date_select">Select date</string>
+    <string name="description_item">Please add the description</string>
 </resources>

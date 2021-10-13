@@ -8,12 +8,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignment.R
+import com.example.assignment.model.DateModel
 import com.example.assignment.model.ItemModel
 
 class ItemAdapter(
     private val context: Context,
     private var dataList: ArrayList<ItemModel>,
-    private var itemClickListener: ItemItemClickListener
+    private var itemClickListener: ItemItemClickListener,
+    private val itemAtPos: DateModel,
+    private val positionOfDate: Int
 ) :
 
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -32,7 +35,7 @@ class ItemAdapter(
             itemName?.text = itemAtPos.item
             itemPrice?.text = context.getString(R.string.dollar_amount, itemAtPos.price)
             removeIcon?.setOnClickListener {
-                itemClickListener.onItemClick(position, itemAtPos)
+                itemClickListener.onItemClick(position, itemAtPos, positionOfDate)
             }
         }
     }
@@ -48,6 +51,6 @@ class ItemAdapter(
     }
 
     interface ItemItemClickListener {
-        fun onItemClick(position: Int, itemAtPos: ItemModel)
+        fun onItemClick(position: Int, itemAtPos: ItemModel, positionOfDate: Int)
     }
 }

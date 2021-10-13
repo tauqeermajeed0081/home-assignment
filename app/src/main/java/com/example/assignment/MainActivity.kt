@@ -5,14 +5,12 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignment.adapter.DateAdapter
 import com.example.assignment.adapter.ItemAdapter
@@ -21,6 +19,7 @@ import com.example.assignment.model.DateModel
 import com.example.assignment.model.ItemData
 import com.example.assignment.model.ItemModel
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -83,6 +82,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         val incDecValue = dialog?.findViewById<EditText>(R.id.incDecValue)
         val addBtn = dialog?.findViewById<Button>(R.id.addButton)
         val txtItemName = dialog?.findViewById<TextInputEditText>(R.id.txtItemName)
+        val descriptionEditText = dialog?.findViewById<TextInputLayout>(R.id.descriptionEditText)
         dateEditTxt = dialog?.findViewById(R.id.edtDate)!!
         dateEditTxt.setText(getCurrentTimeStamp())
         itemData.clear()
@@ -157,35 +157,49 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             dateEditTxt.transformIntoDatePicker(this, "dd'th' MMMM, yyyy", Date())
         }
         addBtn?.setOnClickListener {
-            dialog?.dismiss()
-            val indexFound = containsSameDate(dateEditTxt.text.toString(), dateModelArray)
-            if (indexFound != -1) {
-                // already exist
-                val prevUserList = dateModelArray[indexFound].itemList
-                prevUserList.add(
-                    ItemModel(
-                        txtItemName?.text.toString(),
-                        incDecValue?.text.toString().toInt()
-                    )
-                )
-            } else {
-                // not already exist
-                val arrayListOfItem = ArrayList<ItemModel>()
-                val item = ItemModel()
-                item.item = txtItemName?.text.toString()
-                item.price = incDecValue?.text.toString().toInt()
-                arrayListOfItem.add(item)
-                dateModelArray.add(DateModel(dateEditTxt.text.toString(), arrayListOfItem))
+            when {
+                spinner?.selectedItemPosition == 0 -> {
+                    Toast.makeText(this, "Please select the Transaction Type", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                txtItemName?.text.isNullOrEmpty() -> {
+                    descriptionEditText?.error = resources.getString(R.string.description_item)
+                }
+                else -> {
+                    dialog?.dismiss()
+                    val indexFound = containsSameDate(dateEditTxt.text.toString(), dateModelArray)
+                    if (indexFound != -1) {
+                        // already exist
+                        val prevItemList = dateModelArray[indexFound].itemList
+                        prevItemList.add(
+                            ItemModel(
+                                txtItemName?.text.toString(),
+                                incDecValue?.text.toString().toInt()
+                            )
+                        )
+                    } else {
+                        // not already exist
+                        val arrayListOfItem = ArrayList<ItemModel>()
+                        val item = ItemModel()
+                        item.item = txtItemName?.text.toString()
+                        item.price = incDecValue?.text.toString().toInt()
+                        arrayListOfItem.add(item)
+                        dateModelArray.add(DateModel(dateEditTxt.text.toString(), arrayListOfItem))
+                    }
+                    dateAdapter?.notifyDataSetChanged()
+                }
             }
-            //dateAdapter?.notifyItemChanged(itemListModelArray.size.minus(1))
-            dateAdapter?.notifyDataSetChanged()
         }
         dialog?.show()
     }
 
-    override fun onItemClick(position: Int, itemAtPos: ItemModel) {
-        itemListModelArray.remove(itemAtPos)
-        dateAdapter?.itemListAdapter?.notifyItemRemoved(position)
+    override fun onItemClick(position: Int, itemAtPos: ItemModel, positionOfDate: Int) {
+        val tempDateArrayObj = dateModelArray[positionOfDate]
+        val tempItemArray = tempDateArrayObj.itemList
+        tempItemArray.remove(itemAtPos)
+        if (tempItemArray.size == 0) dateModelArray.remove(tempDateArrayObj)
+
+        dateAdapter?.notifyDataSetChanged()
     }
 
     private fun EditText.transformIntoDatePicker(
