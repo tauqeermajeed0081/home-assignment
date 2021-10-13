@@ -10,12 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.assignment.R
 import com.example.assignment.model.DateModel
 
-class DateAdapter (
+class DateAdapter(
     private val context: Context,
     private var dataList: ArrayList<DateModel>,
-):
+    private var itemClickListener: ItemAdapter.ItemItemClickListener
+) :
 
     RecyclerView.Adapter<DateAdapter.ViewHolder>() {
+    lateinit var itemListAdapter: ItemAdapter
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
@@ -32,10 +34,10 @@ class DateAdapter (
             date?.text = itemAtPos.date
             itemListRv.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            val itemListAdapter =
+            itemListAdapter =
                 ItemAdapter(
                     context,
-                    itemAtPos.itemList
+                    itemAtPos.itemList, itemClickListener
                 )
             itemListRv.adapter = itemListAdapter
         }

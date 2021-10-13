@@ -21,4 +21,7 @@
         <item>Saturn</item>
         <item>Uranus</item>
         <item>Neptune</item>
-    </string-array></resources>
+    </string-array>
+    <string name="dollar_amount">$ %1$d</string>
+    <string name="date_select">Select date</string>
+</resources>

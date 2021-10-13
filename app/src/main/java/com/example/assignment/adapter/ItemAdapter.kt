@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignment.R
@@ -11,7 +12,8 @@ import com.example.assignment.model.ItemModel
 
 class ItemAdapter(
     private val context: Context,
-    private var dataList: ArrayList<ItemModel>
+    private var dataList: ArrayList<ItemModel>,
+    private var itemClickListener: ItemItemClickListener
 ) :
 
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -25,11 +27,13 @@ class ItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        with(holder)
-        {
+        with(holder) {
             val itemAtPos = dataList[position]
             itemName?.text = itemAtPos.item
-            itemPrice?.text = itemAtPos.price.toString()
+            itemPrice?.text = context.getString(R.string.dollar_amount, itemAtPos.price)
+            removeIcon?.setOnClickListener {
+                itemClickListener.onItemClick(position, itemAtPos)
+            }
         }
     }
 
@@ -40,5 +44,10 @@ class ItemAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var itemName: TextView? = itemView.findViewById(R.id.transactionItem)
         var itemPrice: TextView? = itemView.findViewById(R.id.itemPrice)
+        var removeIcon: ImageView? = itemView.findViewById(R.id.removeIcon)
+    }
+
+    interface ItemItemClickListener {
+        fun onItemClick(position: Int, itemAtPos: ItemModel)
     }
 }
