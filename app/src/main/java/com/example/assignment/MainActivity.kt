@@ -11,10 +11,13 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignment.adapter.DateAdapter
 import com.example.assignment.adapter.ItemAdapter
 import com.example.assignment.databinding.ActivityMainBinding
+import com.example.assignment.db.UserData
+import com.example.assignment.db.UserViewModel
 import com.example.assignment.model.DateModel
 import com.example.assignment.model.ItemData
 import com.example.assignment.model.ItemModel
@@ -35,12 +38,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     private var TAG = "MainActivity"
     private lateinit var dateEditTxt: TextInputEditText
     private var sdf: SimpleDateFormat? = null
+    private lateinit var mUserViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
         binding.addButton.setOnClickListener(this)
         //populateData()
         setUpRV()
@@ -157,6 +162,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             dateEditTxt.transformIntoDatePicker(this, "dd'th' MMMM, yyyy", Date())
         }
         addBtn?.setOnClickListener {
+            mUserViewModel.addUser(UserData(0, 0,0,1000))
             when {
                 spinner?.selectedItemPosition == 0 -> {
                     Toast.makeText(this, "Please select the Transaction Type", Toast.LENGTH_SHORT)
