@@ -4,6 +4,7 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:layout_marginTop="@dimen/_8sdp"
         android:padding="@dimen/_8sdp"
         android:id="@+id/dateLayout"
         android:layout_width="match_parent"
