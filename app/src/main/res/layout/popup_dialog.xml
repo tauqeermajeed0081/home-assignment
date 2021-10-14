@@ -133,7 +133,7 @@
             android:layout_below="@+id/relInner">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtDate"
+                android:id="@+id/dateEditTxt"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_45sdp"
                 android:descendantFocusability="blocksDescendants"
@@ -151,7 +151,7 @@
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/addButton"
+        android:id="@+id/addButtonPopup"
         android:layout_width="@dimen/_120sdp"
         android:layout_height="@dimen/_40sdp"
         android:layout_below="@+id/relInc"

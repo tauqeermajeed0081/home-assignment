@@ -23,6 +23,7 @@ import com.example.assignment.model.UserData
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.popup_dialog.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -32,10 +33,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     lateinit var binding: ActivityMainBinding
     private var dateAdapter: DateAdapter? = null
     private var dateModelArray: ArrayList<DateModel> = ArrayList()
-    var dialog: Dialog? = null
+    private var dialog: Dialog? = null
     private var itemData: ArrayList<SpinnerData> = ArrayList()
     private var TAG = "MainActivity"
-    private lateinit var dateEditTxt: TextInputEditText
     private var sdf: SimpleDateFormat? = null
     private lateinit var tinyDB: TinyDB
     private lateinit var userData: UserData
@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     private var expenseVal: Long = 0
     private var isExpense = false
     private var itemType = ""
+    private lateinit var dateEditTxt: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             tinyDB.putBoolean("isFirstTime", true)
         }
         userData = getFromDb()
-        binding.addButton.setOnClickListener(this)
+        addButtonFloating.setOnClickListener(this)
         populateData()
         setUpRV()
     }
@@ -64,9 +65,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     private fun setUpRV() {
         val layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.rvList.layoutManager = layoutManager
+        rvList.layoutManager = layoutManager
         dateAdapter = DateAdapter(this, dateModelArray, this)
-        binding.rvList.adapter = dateAdapter
+        rvList.adapter = dateAdapter
     }
 
     private fun populateData() {
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         expenseVal = userData.userExpense
         incomeVal = userData.userIncome
         balanceVal = userData.userBalance
-        if (!userData.userTransactionList.isNullOrEmpty()){
+        if (!userData.userTransactionList.isNullOrEmpty()) {
             dateModelArray = userData.userTransactionList!!
             dateAdapter?.notifyDataSetChanged()
         }
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
 
     override fun onClick(v: View?) {
         when (v) {
-            binding.addButton -> {
+            addButtonFloating -> {
                 alertDialog()
             }
         }
@@ -97,14 +98,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         dialog?.setCancelable(true)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val spinner = dialog?.findViewById<Spinner>(R.id.mySpinner)
+        val mySpinner = dialog?.findViewById<Spinner>(R.id.mySpinner)
         val up = dialog?.findViewById<ImageView>(R.id.up)
         val down = dialog?.findViewById<ImageView>(R.id.down)
         val incDecValue = dialog?.findViewById<EditText>(R.id.incDecValue)
-        val addBtn = dialog?.findViewById<Button>(R.id.addButton)
+        val addButtonPopup = dialog?.findViewById<Button>(R.id.addButtonPopup)
         val txtItemName = dialog?.findViewById<TextInputEditText>(R.id.txtItemName)
         val descriptionEditText = dialog?.findViewById<TextInputLayout>(R.id.descriptionEditText)
-        dateEditTxt = dialog?.findViewById(R.id.edtDate)!!
+        dateEditTxt = dialog?.findViewById(R.id.dateEditTxt)!!
         dateEditTxt.setText(getCurrentTimeStamp())
         itemData.clear()
         itemData.add(SpinnerData(0, "Transaction Type"))
@@ -140,9 +141,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             }
 
         }
-        spinner?.adapter = adapter
+        mySpinner?.adapter = adapter
 
-        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        mySpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -178,9 +179,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             dateEditTxt.transformIntoDatePicker(this, "dd'th' MMMM, yyyy")
             dateEditTxt.transformIntoDatePicker(this, "dd'th' MMMM, yyyy", Date())
         }
-        addBtn?.setOnClickListener {
+        addButtonPopup?.setOnClickListener {
             when {
-                spinner?.selectedItemPosition == 0 -> {
+                mySpinner?.selectedItemPosition == 0 -> {
                     Toast.makeText(this, "Please select the Transaction Type", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -192,8 +193,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                     if (isExpense) {
                         expenseVal = expenseVal.plus(incDecValue?.text.toString().toLong())
                         itemType = "Expense"
-                    }
-                    else {
+                    } else {
                         incomeVal = incomeVal.plus(incDecValue?.text.toString().toLong())
                         itemType = "Income"
                     }
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         return tinyDB.getObject("userData", UserData::class.java)
     }
 
-    private fun setProgressBar(){
+    private fun setProgressBar() {
         progressBar.max = incomeVal.toInt()
         progressBar.progress = expenseVal.toInt()
     }
@@ -259,7 +259,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         val tempItemArray = tempDateArrayObj.itemList
         if (itemAtPos.itemType.equals("Expense")) {
             expenseVal = itemAtPos.price?.toLong()?.let { expenseVal.minus(it) }!!
-        } else{
+        } else {
             incomeVal = incomeVal.minus(itemAtPos.price!!)
         }
         balanceVal = balanceVal.plus(itemAtPos.price!!)
