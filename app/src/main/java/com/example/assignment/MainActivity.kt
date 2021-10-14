@@ -11,18 +11,18 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignment.adapter.DateAdapter
 import com.example.assignment.adapter.ItemAdapter
 import com.example.assignment.databinding.ActivityMainBinding
-import com.example.assignment.db.UserData
-import com.example.assignment.db.UserViewModel
+import com.example.assignment.db.TinyDB
 import com.example.assignment.model.DateModel
-import com.example.assignment.model.ItemData
+import com.example.assignment.model.SpinnerData
 import com.example.assignment.model.ItemModel
+import com.example.assignment.model.UserData
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -32,22 +32,32 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     lateinit var binding: ActivityMainBinding
     private var dateAdapter: DateAdapter? = null
     private var dateModelArray: ArrayList<DateModel> = ArrayList()
-    private var itemListModelArray: ArrayList<ItemModel> = ArrayList()
     var dialog: Dialog? = null
-    private var itemData: ArrayList<ItemData> = ArrayList()
+    private var itemData: ArrayList<SpinnerData> = ArrayList()
     private var TAG = "MainActivity"
     private lateinit var dateEditTxt: TextInputEditText
     private var sdf: SimpleDateFormat? = null
-    private lateinit var mUserViewModel: UserViewModel
+    private lateinit var tinyDB: TinyDB
+    private lateinit var userData: UserData
+    private var balanceVal: Long = 0
+    private var incomeVal: Long = 0
+    private var expenseVal: Long = 0
+    private var isExpense = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        tinyDB = TinyDB(applicationContext)
+        if (!tinyDB.getBoolean("isFirstTime")) {
+            saveIntoDb(0, 0, 0, null)
+            setProgressBar()
+            tinyDB.putBoolean("isFirstTime", true)
+        }
+        userData = getFromDb()
         binding.addButton.setOnClickListener(this)
-        //populateData()
+        populateData()
         setUpRV()
     }
 
@@ -60,11 +70,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     }
 
     private fun populateData() {
-        for (i in 0..5) {
-            itemListModelArray.add(ItemModel("Grocery", 100))
+        expense.text = getString(R.string.balance_value, userData.userExpense)
+        income.text = getString(R.string.balance_value, userData.userIncome)
+        txtBalance.text = getString(R.string.balance_value, userData.userBalance)
+        expenseVal = userData.userExpense
+        incomeVal = userData.userIncome
+        balanceVal = userData.userBalance
+        if (!userData.userTransactionList.isNullOrEmpty()){
+            dateModelArray = userData.userTransactionList!!
+            dateAdapter?.notifyDataSetChanged()
         }
-        dateModelArray.add(DateModel(getCurrentTimeStamp(), itemListModelArray))
-        dateAdapter?.notifyDataSetChanged()
     }
 
     override fun onClick(v: View?) {
@@ -91,10 +106,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         dateEditTxt = dialog?.findViewById(R.id.edtDate)!!
         dateEditTxt.setText(getCurrentTimeStamp())
         itemData.clear()
-        itemData.add(ItemData(1, "Transaction Type"))
-        itemData.add(ItemData(1, "Expense"))
-        itemData.add(ItemData(2, "Income"))
-        val adapter: ArrayAdapter<ItemData> = object : ArrayAdapter<ItemData>(
+        itemData.add(SpinnerData(0, "Transaction Type"))
+        itemData.add(SpinnerData(1, "Expense"))
+        itemData.add(SpinnerData(2, "Income"))
+        val adapter: ArrayAdapter<SpinnerData> = object : ArrayAdapter<SpinnerData>(
             this,
             android.R.layout.simple_spinner_dropdown_item,
             itemData
@@ -136,6 +151,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                 if (position != 0) {
                     val itemData = adapter.getItem(position)
                     Log.d(TAG, "onItemSelected: ${itemData?.id}")
+                    isExpense = itemData?.id?.equals(1) == true
                 }
             }
 
@@ -162,7 +178,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             dateEditTxt.transformIntoDatePicker(this, "dd'th' MMMM, yyyy", Date())
         }
         addBtn?.setOnClickListener {
-            mUserViewModel.addUser(UserData(0, 0,0,1000))
             when {
                 spinner?.selectedItemPosition == 0 -> {
                     Toast.makeText(this, "Please select the Transaction Type", Toast.LENGTH_SHORT)
@@ -173,6 +188,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                 }
                 else -> {
                     dialog?.dismiss()
+                    if (isExpense)
+                        expenseVal = expenseVal.plus(incDecValue?.text.toString().toLong())
+                    else
+                        incomeVal = incomeVal.plus(incDecValue?.text.toString().toLong())
                     val indexFound = containsSameDate(dateEditTxt.text.toString(), dateModelArray)
                     if (indexFound != -1) {
                         // already exist
@@ -193,10 +212,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                         dateModelArray.add(DateModel(dateEditTxt.text.toString(), arrayListOfItem))
                     }
                     dateAdapter?.notifyDataSetChanged()
+                    txtBalance.text =
+                        getString(R.string.balance_value, calculateBalance(incomeVal, expenseVal))
+                    expense.text = getString(R.string.balance_value, expenseVal)
+                    income.text = getString(R.string.balance_value, incomeVal)
+                    balanceVal = calculateBalance(incomeVal, expenseVal)
+                    saveIntoDb(expenseVal, incomeVal, balanceVal, dateModelArray)
+                    setProgressBar()
                 }
             }
         }
         dialog?.show()
+    }
+
+    private fun saveIntoDb(
+        expense: Long,
+        income: Long,
+        balance: Long,
+        transactionList: ArrayList<DateModel>?
+    ) {
+        tinyDB.putObject("userData", UserData(expense, income, balance, transactionList))
+    }
+
+    private fun getFromDb(): UserData {
+        return tinyDB.getObject("userData", UserData::class.java)
+    }
+
+    private fun setProgressBar(){
+        progressBar.max = incomeVal.toInt()
+        progressBar.progress = expenseVal.toInt()
+    }
+
+    private fun calculateBalance(income: Long, expense: Long): Long {
+        return income.minus(expense)
     }
 
     override fun onItemClick(position: Int, itemAtPos: ItemModel, positionOfDate: Int) {

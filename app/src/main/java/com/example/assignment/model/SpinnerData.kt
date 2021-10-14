@@ -1,6 +1,6 @@
 package com.example.assignment.model
 
-data class ItemData(
+data class SpinnerData(
     var id: Int? = -1,
     var name: String? = null
 ) {
