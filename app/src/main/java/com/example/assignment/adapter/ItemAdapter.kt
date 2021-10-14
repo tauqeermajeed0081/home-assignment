@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignment.R
 import com.example.assignment.model.DateModel
@@ -37,6 +38,11 @@ class ItemAdapter(
             removeIcon?.setOnClickListener {
                 itemClickListener.onItemClick(position, itemAtPos, positionOfDate)
             }
+            if (itemAtPos.itemType.equals("Expense"))
+                itemType?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.expense))
+            else
+                itemType?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.income))
+
         }
     }
 
@@ -48,6 +54,7 @@ class ItemAdapter(
         var itemName: TextView? = itemView.findViewById(R.id.transactionItem)
         var itemPrice: TextView? = itemView.findViewById(R.id.itemPrice)
         var removeIcon: ImageView? = itemView.findViewById(R.id.removeIcon)
+        var itemType: ImageView? = itemView.findViewById(R.id.itemType)
     }
 
     interface ItemItemClickListener {

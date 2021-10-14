@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     private var incomeVal: Long = 0
     private var expenseVal: Long = 0
     private var isExpense = false
+    private var itemType = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
         tinyDB = TinyDB(applicationContext)
         if (!tinyDB.getBoolean("isFirstTime")) {
             saveIntoDb(0, 0, 0, null)
-            setProgressBar()
             tinyDB.putBoolean("isFirstTime", true)
         }
         userData = getFromDb()
@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
             dateModelArray = userData.userTransactionList!!
             dateAdapter?.notifyDataSetChanged()
         }
+        setProgressBar()
     }
 
     override fun onClick(v: View?) {
@@ -188,10 +189,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                 }
                 else -> {
                     dialog?.dismiss()
-                    if (isExpense)
+                    if (isExpense) {
                         expenseVal = expenseVal.plus(incDecValue?.text.toString().toLong())
-                    else
+                        itemType = "Expense"
+                    }
+                    else {
                         incomeVal = incomeVal.plus(incDecValue?.text.toString().toLong())
+                        itemType = "Income"
+                    }
                     val indexFound = containsSameDate(dateEditTxt.text.toString(), dateModelArray)
                     if (indexFound != -1) {
                         // already exist
@@ -199,7 +204,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                         prevItemList.add(
                             ItemModel(
                                 txtItemName?.text.toString(),
-                                incDecValue?.text.toString().toInt()
+                                incDecValue?.text.toString().toInt(),
+                                itemType
                             )
                         )
                     } else {
@@ -208,6 +214,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
                         val item = ItemModel()
                         item.item = txtItemName?.text.toString()
                         item.price = incDecValue?.text.toString().toInt()
+                        item.itemType = itemType
                         arrayListOfItem.add(item)
                         dateModelArray.add(DateModel(dateEditTxt.text.toString(), arrayListOfItem))
                     }
@@ -250,9 +257,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, ItemAdapter.Item
     override fun onItemClick(position: Int, itemAtPos: ItemModel, positionOfDate: Int) {
         val tempDateArrayObj = dateModelArray[positionOfDate]
         val tempItemArray = tempDateArrayObj.itemList
+        if (itemAtPos.itemType.equals("Expense")) {
+            expenseVal = itemAtPos.price?.toLong()?.let { expenseVal.minus(it) }!!
+        } else{
+            incomeVal = incomeVal.minus(itemAtPos.price!!)
+        }
+        balanceVal = balanceVal.plus(itemAtPos.price!!)
+        txtBalance.text =
+            getString(R.string.balance_value, calculateBalance(incomeVal, expenseVal))
+        expense.text = getString(R.string.balance_value, expenseVal)
+        income.text = getString(R.string.balance_value, incomeVal)
         tempItemArray.remove(itemAtPos)
         if (tempItemArray.size == 0) dateModelArray.remove(tempDateArrayObj)
 
+        saveIntoDb(expenseVal, incomeVal, balanceVal, dateModelArray)
+        setProgressBar()
         dateAdapter?.notifyDataSetChanged()
     }
 

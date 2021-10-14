@@ -6,10 +6,17 @@
     android:padding="@dimen/_6sdp">
 
     <LinearLayout
+        android:orientation="horizontal"
         android:id="@+id/linearL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:layout_marginEnd="@dimen/_4sdp"
+            android:layout_gravity="center"
+            android:id="@+id/itemType"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"/>
         <TextView
             android:layout_gravity="center"
             android:id="@+id/transactionItem"
